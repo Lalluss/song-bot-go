@@ -12,6 +12,7 @@ tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 func main() {
+const CHANNEL_ID int64 = -1004306196694
 go func() {
 port := os.Getenv("PORT")
 if port == "" {
@@ -44,7 +45,27 @@ for update := range updates {
 	if update.Message == nil {
 		continue
 	}
+        if update.Message.Chat.ID == CHANNEL_ID &&
+update.Message.Document != nil {
 
+title := update.Message.Caption
+
+if title == "" {
+	continue
+}
+
+log.Printf("Movie uploaded: %s", title)
+
+bot.Send(
+	tgbotapi.NewMessage(
+		update.Message.Chat.ID,
+		"✅ Movie detected: "+title,
+	),
+)
+
+continue
+
+}
 	// Welcome new members
 	if len(update.Message.NewChatMembers) > 0 {
 		for _, user := range update.Message.NewChatMembers {
@@ -102,6 +123,11 @@ for update := range updates {
 			update.Message.Chat.ID,
 			fmt.Sprintf("Chat ID: %d", update.Message.Chat.ID),
 		))
+        case "/movie":
+bot.Send(tgbotapi.NewMessage(
+update.Message.Chat.ID,
+"Movie search coming soon 🎬",
+))
 
 	case "/info":
 		text := fmt.Sprintf(
