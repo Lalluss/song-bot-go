@@ -2,12 +2,25 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 func main() {
+	go func() {
+		port := os.Getenv("PORT")
+		if port == "" {
+			port = "8000"
+		}
+
+		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("Bot is running"))
+		})
+
+		log.Fatal(http.ListenAndServe(":"+port, nil))
+	}()
 	token := os.Getenv("BOT_TOKEN")
 
 	bot, err := tgbotapi.NewBotAPI(token)
